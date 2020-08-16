@@ -101,38 +101,6 @@ public class Manager : MonoBehaviour {
         return res;
     }
 
-    /*void GetFolderPath ()
-    {
-        OpenFile ofn = new OpenFile();
-
-        ofn.structSize = Marshal.SizeOf(ofn);
-
-        ofn.filter = "All Files\0*.*\0\0";
-
-        ofn.file = new string(new char[256]);
-
-        ofn.maxFile = ofn.file.Length;
-
-        ofn.fileTitle = new string(new char[64]);
-
-        ofn.maxFileTitle = ofn.fileTitle.Length;
-        string path = Application.streamingAssetsPath;
-        path = path.Replace('/', '\\');
-        //默認路徑 
-        ofn.initialDir = path;
-        //ofn.initialDir = "D:\\MyProject\\UnityOpenCV\\Assets\\StreamingAssets";  
-        ofn.title = "Open Project";
-
-        ofn.defExt = "JPG";//顯示文件的類型  
-        //注意 一下項目不一定要全選 但是0x00000008項不要缺少  
-        ofn.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000200 | 0x00000008;//OFN_EXPLORER|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST| OFN_ALLOWMULTISELECT|OFN_NOCHANGEDIR  
-
-        if (WindowDll.GetOpenFileName(ofn))
-        {
-            Debug.Log("Selected file with full path: {0}" + ofn.file);
-        }
-    }*/
-
     private IEnumerator GetImageByWWW (string rPath)
     {
         WWW www = new WWW("file://" + rPath);
