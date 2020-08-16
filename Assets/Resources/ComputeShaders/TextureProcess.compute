@@ -1,0 +1,33 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel TextureProcess
+
+//要處理的原圖
+Texture2D<float4> inputTex;
+//原圖中要留下部份的開始座標
+int iTexStX;
+int iTexStY;
+//原圖中要留下部份的寬高
+int iTexWidth;
+int iTexHeight;
+
+//開始座標 (原圖尺寸較小,要擴增周圍透明部份時所需的參數)
+int startX;
+int startY;
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> outputTex;
+
+[numthreads(8,8,1)]
+void TextureProcess(uint3 id : SV_DispatchThreadID)
+{
+	// TODO: insert actual code here!
+
+	/*if (id.x >= startX && id.x < startX + iTexWidth && id.y >= startY && id.y < startY + iTexHeight) {
+		outputTex[id.xy] = inputTex[int2(id.x - startX + iTexStX, id.y - startY + iTexStY)];
+	}*/
+
+	int inRange = step(startX, id.x) * step(startY, id.y) * (1 - step(startX + iTexWidth, id.x)) * (1 - step(startY + iTexHeight, id.y));
+	outputTex[id.xy] = lerp(outputTex[id.xy], inputTex[int2(id.x - startX + iTexStX, id.y - startY + iTexStY)], inRange);
+	
+}

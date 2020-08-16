@@ -1,0 +1,93 @@
+﻿//活用compute shader的GPU平行處理來偵測透明圖檔的實際寬高
+//4組各自處理左,右,下,上邊界偵測
+//處理上下的將原圖橫切32份平行處理;左右則將原圖縱切32份
+//最後回傳128項各自偵測結果給CPU,CPU再比較出最後的實際寬高
+
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel EdgeDetection
+
+//偵測的原圖
+Texture2D<float4> inputTex;
+//原圖寬
+int iTexWidth;
+//原圖高
+int iTexHeight;
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWStructuredBuffer<int> Result;
+
+[numthreads(32,4,1)]
+void EdgeDetection(uint3 id : SV_GroupThreadID)
+{
+	// TODO: insert actual code here!
+
+	if (id.y == 0) {
+		int range = floor(iTexWidth / 32);
+		int deteL = id.x * range;
+		int edgeL = iTexWidth;
+		for (int i = deteL; i < deteL + range && i < iTexWidth; i++) {
+			for (int j = 0; j < iTexHeight; j++) {
+				if (inputTex[int2(i, j)].a == 0)
+					continue;
+
+				edgeL = i;
+				break;
+			}
+			if (edgeL != iTexWidth)
+				break;
+		}
+		Result[id.x * 4] = edgeL;
+	}
+	else if (id.y == 1) {
+		int range = floor(iTexWidth / 32);
+		int deteR = iTexWidth - 1 - id.x * range;
+		int edgeR = -1;
+		for (int i = deteR; i > deteR - range && i > -1; i--) {
+			for (int j = 0; j < iTexHeight; j++) {
+				if (inputTex[int2(i, j)].a == 0)
+					continue;
+
+				edgeR = i;
+				break;
+			}
+			if (edgeR != -1)
+				break;
+		}
+		Result[id.x * 4 + 1] = edgeR;
+	}
+	else if (id.y == 2) {
+		int range = floor(iTexHeight / 32);
+		int deteD = id.x * range;
+		int edgeD = iTexHeight;
+		for (int i = deteD; i < deteD + range && i < iTexHeight; i++) {
+			for (int j = 0; j < iTexWidth; j++) {
+				if (inputTex[int2(j, i)].a == 0)
+					continue;
+
+				edgeD = i;
+				break;
+			}
+			if (edgeD != iTexHeight)
+				break;
+		}
+		Result[id.x * 4 + 2] = edgeD;
+	}
+	else {
+		int range = floor(iTexHeight / 32);
+		int deteU = iTexHeight - 1 - id.x * range;
+		int edgeU = -1;
+		for (int i = deteU; i > deteU - range && i > -1; i--) {
+			for (int j = 0; j < iTexWidth; j++) {
+				if (inputTex[int2(j, i)].a == 0)
+					continue;
+
+				edgeU = i;
+				break;
+			}
+			if (edgeU != -1)
+				break;
+		}
+		Result[id.x * 4 + 3] = edgeU;
+	}
+}
