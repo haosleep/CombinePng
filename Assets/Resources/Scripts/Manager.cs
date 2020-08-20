@@ -26,6 +26,13 @@ public class Manager : MonoBehaviour {
 
     const string TOGGLE_TEXORDER_SIZE = "TOrderSize";
     const string TOGGLE_TEXORDER_NAME = "TOrderName";
+    
+    public GameObject tgLimitSize;
+    public GameObject gobjLSLinf;
+    /// <summary>
+    /// 最小縮放邊長文字UI
+    /// </summary>
+    Text textLSInf;
 
     /// <summary>
     /// 串圖圖檔list
@@ -266,6 +273,18 @@ public class Manager : MonoBehaviour {
             //取長的為邊長
             int tLonger = Mathf.Max(tWidth, tHeight);
             int eLength = Mathf.NextPowerOfTwo(tLonger);
+            
+            //是否有設定最小邊長
+            if (tgLimitSize.GetComponent<Toggle>().isOn)
+            {
+                int setSize = 0;
+                if(Int32.TryParse(textLSInf.text, out setSize))
+                {
+                    if (eLength < setSize)
+                        eLength = setSize;
+                }
+            }
+            
             //原圖置中,離左邊界和下邊界的距離長
             int disX = (eLength - tWidth) / 2;
             int disY = (eLength - tHeight) / 2;
